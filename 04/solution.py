@@ -17,40 +17,20 @@ def pad(data: tuple[str, ...]) -> tuple[str, ...]:
     return tuple(padded)
 
 
-class Coord:
-    """A location on in the word search board, as a row, column (i, j) index
-    Basically, just a tuple with elementwise addition enabled.
-    """
-
-    def __init__(self, i: int, j: int):
-        self.i = i
-        self.j = j
-
-    def __add__(self, other):
-        if not isinstance(other, Coord):
-            raise NotImplementedError
-        return self.__class__(self.i + other.i, self.j + other.j)
-
-    def __repr__(self) -> str:
-        return f'{self.__class__.__name__}(i={self.i}, j={self.j})'
-
-
-
 def count_xmas(board: str) -> int:
 
-    # a the steps that you can take from an 'X' to find a valid 
+    # the (i, j) steps that you can take from an 'X' to find a valid 
     # 'XMAS' string
     steps = (
-        Coord( 0,  1),  # right
-        Coord( 0, -1),  # left
-        Coord( 1,  0),  # down
-        Coord(-1,  0),  # up
-        Coord( 1,  1),  # diag down right
-        Coord( 1, -1),  # diag down left
-        Coord(-1,  1),  # diag up right
-        Coord(-1, -1),  # diag up left
+        ( 0,  1),  # right
+        ( 0, -1),  # left
+        ( 1,  0),  # down
+        (-1,  0),  # up
+        ( 1,  1),  # diag down right
+        ( 1, -1),  # diag down left
+        (-1,  1),  # diag up right
+        (-1, -1),  # diag up left
     )
-
 
     num_rows = len(board)
     num_cols = len(board[0])
@@ -64,42 +44,34 @@ def count_xmas(board: str) -> int:
     for i in range(1,num_rows+1):
         for j in range(1,num_cols+1):
 
-            x = Coord(i, j)
-            if board[x.i][x.j] != 'X':
+            if board[i][j] != 'X':
                 # starting element must be X, else skip
                 continue
 
             # if the starting element is X, then we must check all directions for XMAS
             for step in steps:
-                m = x + step
-                if board[m.i][m.j] != 'M':
+                mi, mj = i + step[0], j + step[1]
+                if board[mi][mj] != 'M':
                     continue
-                a = m + step
-                if board[a.i][a.j] != 'A':
+                ai, aj = mi + step[0], mj + step[1]
+                if board[ai][aj] != 'A':
                     continue
-                s = a + step
-                if board[s.i][s.j] != 'S':
+                si, sj = ai + step[0], aj + step[1]
+                if board[si][sj] != 'S':
                     continue
                 # found one!
                 matches += 1
     return matches
     
 
-
-if __name__ == '__main__':
-    print('Advent of Code 2024 - Day 4')
-
-    input_file = sys.argv[1]
-
-    ws = read(input_file)
-    print(f'Num XMAS found: {count_xmas(ws)}')
-
-    board = ws
+def count_x_mas(board: tuple[str, ...]) -> int:
 
     num_rows = len(board)
     num_cols = len(board[0])
 
-    board = pad(ws)
+    # apply a 1-element pad to the board. This guarantees we will not get any 
+    # index-out-of-range errors.
+    board = pad(board)
 
     matches = 0
     for i in range(1,num_rows+1):
@@ -109,7 +81,7 @@ if __name__ == '__main__':
                 # middle element must be A, else skip
                 continue
 
-            # if the middle element is A, then we must check both diagonals for MAS
+            # if the middle element is A, then we must check both diagonals for M and S
             diag = {board[i-1][j-1], board[i+1][j+1]}
             if diag != {'M', 'S'}:
                 continue
@@ -120,5 +92,15 @@ if __name__ == '__main__':
             
             # found one!
             matches += 1
+    return matches
 
-    print(f'Num X-MAS found: {matches}')
+
+if __name__ == '__main__':
+    print('Advent of Code 2024 - Day 4')
+
+    input_file = sys.argv[1]
+
+    ws = read(input_file)
+    print(f'Num XMAS found: {count_xmas(ws)}')
+    print(f'Num X-MAS found: {count_x_mas(ws)}')
+
