@@ -35,21 +35,22 @@ class Coord:
         return f'{self.__class__.__name__}(i={self.i}, j={self.j})'
 
 
-# a the steps that you can take from an 'X' to find a valid 
-# 'XMAS' string
-STEPS = (
-    Coord( 0,  1),  # right
-    Coord( 0, -1),  # left
-    Coord( 1,  0),  # down
-    Coord(-1,  0),  # up
-    Coord( 1,  1),  # diag down right
-    Coord( 1, -1),  # diag down left
-    Coord(-1,  1),  # diag up right
-    Coord(-1, -1),  # diag up left
-)
-
 
 def count_xmas(board: str) -> int:
+
+    # a the steps that you can take from an 'X' to find a valid 
+    # 'XMAS' string
+    steps = (
+        Coord( 0,  1),  # right
+        Coord( 0, -1),  # left
+        Coord( 1,  0),  # down
+        Coord(-1,  0),  # up
+        Coord( 1,  1),  # diag down right
+        Coord( 1, -1),  # diag down left
+        Coord(-1,  1),  # diag up right
+        Coord(-1, -1),  # diag up left
+    )
+
 
     num_rows = len(board)
     num_cols = len(board[0])
@@ -69,7 +70,7 @@ def count_xmas(board: str) -> int:
                 continue
 
             # if the starting element is X, then we must check all directions for XMAS
-            for step in STEPS:
+            for step in steps:
                 m = x + step
                 if board[m.i][m.j] != 'M':
                     continue
@@ -82,7 +83,6 @@ def count_xmas(board: str) -> int:
                 # found one!
                 matches += 1
     return matches
-
     
 
 
@@ -94,13 +94,31 @@ if __name__ == '__main__':
     ws = read(input_file)
     print(f'Num XMAS found: {count_xmas(ws)}')
 
+    board = ws
 
+    num_rows = len(board)
+    num_cols = len(board[0])
 
-                
-                    
+    board = pad(ws)
 
+    matches = 0
+    for i in range(1,num_rows+1):
+        for j in range(1,num_cols+1):
 
+            if board[i][j] != 'A':
+                # middle element must be A, else skip
+                continue
 
+            # if the middle element is A, then we must check both diagonals for MAS
+            diag = {board[i-1][j-1], board[i+1][j+1]}
+            if diag != {'M', 'S'}:
+                continue
 
+            diag = {board[i+1][j-1], board[i-1][j+1]}
+            if diag != {'M', 'S'}:
+                continue
+            
+            # found one!
+            matches += 1
 
-   
+    print(f'Num X-MAS found: {matches}')
